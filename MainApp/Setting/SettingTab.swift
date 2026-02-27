@@ -129,6 +129,8 @@ struct SettingTabView: View {
                     if self.canFlickLayout(appStates.japaneseLayout) {
                         FlickSensitivitySettingView(.flickSensitivity)
                             .searchKeys("フリックの感度", "感度")
+                        FlickSuggestDismissDurationSettingView(.flickSuggestDismissDuration)
+                            .searchKeys("フリックサジェストの表示時間", "サジェスト", "フリック")
                     }
                 }
                 .inheritSearchKeys()
