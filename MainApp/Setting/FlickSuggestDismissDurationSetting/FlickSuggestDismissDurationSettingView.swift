@@ -9,12 +9,10 @@ import SwiftUIUtils
 
 struct FlickSuggestDismissDurationSettingView: View {
     typealias SettingKey = FlickSuggestDismissDurationKey
-    @State private var enabled: Bool
     @State private var setting: SettingUpdater<SettingKey>
 
     @MainActor init(_ key: SettingKey) {
         self._setting = .init(initialValue: .init())
-        _enabled = State(initialValue: SettingKey.value != SettingKey.defaultValue)
     }
 
     @MainActor private var explanation: LocalizedStringKey {
@@ -29,22 +27,14 @@ struct FlickSuggestDismissDurationSettingView: View {
     }
 
     var body: some View {
-        Toggle(isOn: $enabled) {
+        VStack {
             HStack {
                 Text(SettingKey.title)
                 HelpAlertButton(title: SettingKey.title, explanation: SettingKey.explanation)
+                Spacer()
             }
-        }
-        .onChange(of: enabled) { (_, newValue) in
-            if !newValue {
-                setting.value = SettingKey.defaultValue
-            }
-        }
-        if enabled {
-            VStack {
-                Slider(value: $setting.value, in: 0 ... 0.1)
-                Text(explanation)
-            }
+            Slider(value: $setting.value, in: 0 ... 0.1)
+            Text(explanation)
         }
     }
 }
