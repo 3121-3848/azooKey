@@ -68,6 +68,18 @@ extension KeyboardSettingKey where Self == FlickSensitivitySettingKey {
     public static var flickSensitivity: Self { .init() }
 }
 
+/// フリックサジェストが消えるまでの遅延時間（秒）。0〜0.5秒を想定。
+public struct FlickSuggestDismissDurationKey: DoubleKeyboardSettingKey {
+    public static let title: LocalizedStringKey = "フリックサジェストの表示時間"
+    public static let explanation: LocalizedStringKey = "フリック入力後にサジェスト（方向ガイド）が表示される時間を調整できます。短くすると素早く消え、長くするとゆっくり消えます。"
+    public static let defaultValue: Double = 0.07
+    public static let key: String = "flick_suggest_dismiss_duration"
+}
+
+extension KeyboardSettingKey where Self == FlickSuggestDismissDurationKey {
+    public static var flickSuggestDismissDuration: Self { .init() }
+}
+
 /// キーボードの高さを調整できます。
 public struct KeyboardHeightScaleSettingKey: DoubleKeyboardSettingKey {
     public static let title: LocalizedStringKey = "キーボードの高さ"

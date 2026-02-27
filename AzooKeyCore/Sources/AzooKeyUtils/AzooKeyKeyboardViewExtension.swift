@@ -54,6 +54,10 @@ public enum AzooKeyKeyboardViewExtension: ApplicationSpecificKeyboardViewExtensi
         FlickSensitivitySettingKey.value
     }
 
+    public static var flickSuggestDismissDuration: Double {
+        FlickSuggestDismissDurationKey.value
+    }
+
     public static var resultViewFontSize: Double {
         ResultViewFontSize.value
     }

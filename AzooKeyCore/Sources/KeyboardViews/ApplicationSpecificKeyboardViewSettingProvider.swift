@@ -20,6 +20,8 @@ import Foundation
     static var englishKeyboardLayout: LanguageLayout { get }
 
     static var flickSensitivity: Double { get }
+    /// フリックサジェストが消えるまでの遅延時間（秒）
+    static var flickSuggestDismissDuration: Double { get }
     static var resultViewFontSize: Double { get }
     static var keyViewFontSize: Double { get }
 
