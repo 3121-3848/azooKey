@@ -984,19 +984,26 @@ final class InputManager {
         debug("InputManager.setResult: value to be input", inputData)
         let options = self.getConvertRequestOptions(inputStylePreference: inputData.input.last?.inputStyle)
         debug("InputManager.setResult: options", options)
-        let results = self.kanaKanjiConverter.requestCandidates(inputData, options: options)
 
-        // 表示を更新する
-        if !self.isSelected {
+        // ライブ変換OFFの場合、表示テキスト（かな）は変換結果に依存しないため、
+        // requestCandidates() のブロッキング処理の前に先に表示を更新する。
+        // これにより文字がすぐに画面に反映され、入力レスポンスが向上する。
+        if !self.isSelected && !liveConversionEnabled {
             if self.displayedTextManager.shouldSkipMarkedTextChange {
                 self.previousSystemOperation = .setMarkedText
             }
-            if liveConversionEnabled {
-                let liveConversionText = self.liveConversionManager.updateWithNewResults(inputData, results.mainResults, firstClauseResults: results.firstClauseResults, convertTargetCursorPosition: inputData.convertTargetCursorPosition, convertTarget: inputData.convertTarget)
-                self.displayedTextManager.updateComposingText(composingText: self.composingText, newLiveConversionText: liveConversionText)
-            } else {
-                self.displayedTextManager.updateComposingText(composingText: self.composingText, newLiveConversionText: nil)
+            self.displayedTextManager.updateComposingText(composingText: self.composingText, newLiveConversionText: nil)
+        }
+
+        let results = self.kanaKanjiConverter.requestCandidates(inputData, options: options)
+
+        // ライブ変換ONの場合、表示テキストは変換結果そのものなので候補取得後に更新する
+        if !self.isSelected && liveConversionEnabled {
+            if self.displayedTextManager.shouldSkipMarkedTextChange {
+                self.previousSystemOperation = .setMarkedText
             }
+            let liveConversionText = self.liveConversionManager.updateWithNewResults(inputData, results.mainResults, firstClauseResults: results.firstClauseResults, convertTargetCursorPosition: inputData.convertTargetCursorPosition, convertTarget: inputData.convertTarget)
+            self.displayedTextManager.updateComposingText(composingText: self.composingText, newLiveConversionText: liveConversionText)
         }
 
         if let updateResult {
