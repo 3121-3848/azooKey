@@ -168,6 +168,7 @@ struct ResultBar<Extension: ApplicationSpecificKeyboardViewExtension>: View {
                         .padding(.trailing, 10)
                     }
                 }
+                .transition(.asymmetric(insertion: .opacity, removal: .identity))
             }
         }
         .animation(.easeIn(duration: 0.2), value: variableStates.resultModel.displayState == .nothing)
