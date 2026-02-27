@@ -153,14 +153,14 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
     private var longpressDuration: TimeInterval {
         switch self.model.longPressActions(variableStates: variableStates).duration {
         case .light: 0.125
-        case .normal: 0.400
+        case .normal: Extension.SettingProvider.keyLongPressDelay
         }
     }
 
     private func longpressDuration(_ action: LongpressActionType) -> TimeInterval {
         switch action.duration {
         case .light: 0.125
-        case .normal: 0.400
+        case .normal: Extension.SettingProvider.keyLongPressDelay
         }
     }
 

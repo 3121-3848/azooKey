@@ -80,6 +80,30 @@ extension KeyboardSettingKey where Self == FlickSuggestDismissDurationKey {
     public static var flickSuggestDismissDuration: Self { .init() }
 }
 
+/// 長押し連打が始まるまでの遅延時間（秒）。0.1〜1.0秒を想定。
+public struct KeyLongPressDelayKey: DoubleKeyboardSettingKey {
+    public static let title: LocalizedStringKey = "長押し連打の開始速度"
+    public static let explanation: LocalizedStringKey = "バックスペースなどを長押ししたとき、連打が始まるまでの時間を調整できます。短くするほど速く連打が始まります。"
+    public static let defaultValue: Double = 0.4
+    public static let key: String = "key_long_press_delay"
+}
+
+extension KeyboardSettingKey where Self == KeyLongPressDelayKey {
+    public static var keyLongPressDelay: Self { .init() }
+}
+
+/// 長押し連打の間隔（秒）。0.02〜0.5秒を想定。
+public struct KeyRepeatIntervalKey: DoubleKeyboardSettingKey {
+    public static let title: LocalizedStringKey = "長押し連打の速度"
+    public static let explanation: LocalizedStringKey = "バックスペースなどを長押ししたときの連打速度を調整できます。短くするほど速く連打されます。"
+    public static let defaultValue: Double = 0.1
+    public static let key: String = "key_repeat_interval"
+}
+
+extension KeyboardSettingKey where Self == KeyRepeatIntervalKey {
+    public static var keyRepeatInterval: Self { .init() }
+}
+
 /// キーボードの高さを調整できます。
 public struct KeyboardHeightScaleSettingKey: DoubleKeyboardSettingKey {
     public static let title: LocalizedStringKey = "キーボードの高さ"

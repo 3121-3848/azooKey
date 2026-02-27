@@ -132,6 +132,10 @@ struct SettingTabView: View {
                         FlickSuggestDismissDurationSettingView(.flickSuggestDismissDuration)
                             .searchKeys("フリックサジェストの表示時間", "サジェスト", "フリック")
                     }
+                    KeyLongPressDelaySettingView(.keyLongPressDelay)
+                        .searchKeys("長押し連打の開始速度", "長押し", "連打", "バックスペース")
+                    KeyRepeatIntervalSettingView(.keyRepeatInterval)
+                        .searchKeys("長押し連打の速度", "連打", "リピート", "バックスペース")
                 }
                 .inheritSearchKeys()
 

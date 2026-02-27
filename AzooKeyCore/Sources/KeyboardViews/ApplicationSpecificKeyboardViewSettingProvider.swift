@@ -22,6 +22,10 @@ import Foundation
     static var flickSensitivity: Double { get }
     /// フリックサジェストが消えるまでの遅延時間（秒）
     static var flickSuggestDismissDuration: Double { get }
+    /// 長押し連打が始まるまでの遅延時間（秒）
+    static var keyLongPressDelay: Double { get }
+    /// 長押し連打の間隔（秒）
+    static var keyRepeatInterval: Double { get }
     static var resultViewFontSize: Double { get }
     static var keyViewFontSize: Double { get }
 

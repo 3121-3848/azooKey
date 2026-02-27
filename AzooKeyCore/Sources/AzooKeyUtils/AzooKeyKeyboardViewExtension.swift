@@ -58,6 +58,14 @@ public enum AzooKeyKeyboardViewExtension: ApplicationSpecificKeyboardViewExtensi
         FlickSuggestDismissDurationKey.value
     }
 
+    public static var keyLongPressDelay: Double {
+        KeyLongPressDelayKey.value
+    }
+
+    public static var keyRepeatInterval: Double {
+        KeyRepeatIntervalKey.value
+    }
+
     public static var resultViewFontSize: Double {
         ResultViewFontSize.value
     }

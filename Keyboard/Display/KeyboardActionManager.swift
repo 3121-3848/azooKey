@@ -503,7 +503,7 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
             while !Task.isCancelled {
                 action.repeat.first?.feedback(variableStates: variableStates, extension: AzooKeyKeyboardViewExtension.self)
                 self.registerActions(action.repeat, variableStates: variableStates)
-                try await Task.sleep(nanoseconds: 0_100_000_000)
+                try await Task.sleep(nanoseconds: UInt64(KeyRepeatIntervalKey.value * 1_000_000_000))
             }
         }
         self.tasks.append((type: action, task: repeatTask))
