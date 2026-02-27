@@ -368,8 +368,7 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                 let currentFlickMap = self.flickMap()
                 guard !currentFlickMap.isEmpty else { return }
                 let dismiss: Task<Void, Never> = Task { @MainActor in
-                    let dismissNanoseconds = UInt64(Extension.SettingProvider.flickSuggestDismissDuration * 1_000_000_000)
-                    try? await Task.sleep(nanoseconds: dismissNanoseconds)
+                    try? await Task.sleep(nanoseconds: 70_000_000)
                     self.qwertySuggestType = nil
                     self.flickSuggestType = nil
                     self.isSuggesting = false
