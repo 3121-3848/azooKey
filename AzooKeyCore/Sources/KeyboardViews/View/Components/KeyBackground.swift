@@ -16,7 +16,6 @@ struct KeyBackground: View {
                 lineWidth: self.borderWidth
             )
             .frame(width: self.size.width, height: self.size.height)
-            .compositingGroup()
             .shadow(
                 color: self.shadow.color,
                 radius: self.shadow.radius,

@@ -166,8 +166,6 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
 
     private func flickMap() -> [FlickDirection: UnifiedVariation] { model.getFlickVariationMap(variableStates: variableStates) }
 
-    private func variation(for direction: FlickDirection) -> UnifiedVariation? { flickMap()[direction] }
-
     private func linearVariations() -> (arr: [QwertyVariationsModel.VariationElement], direction: VariationsViewDirection) { model.getLinearVariations(variableStates: variableStates) }
 
     private func commitFlickLongPress() {
@@ -216,7 +214,8 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
         DragGesture(minimumDistance: .zero, coordinateSpace: .global)
             .onChanged { value in
                 // Enable only when flick variations exist
-                guard !self.flickMap().isEmpty else { return }
+                let currentFlickMap = self.flickMap()
+                guard !currentFlickMap.isEmpty else { return }
                 if lifecycle.mode == .none {
                     lifecycle.mode = .flick
                 }
@@ -284,7 +283,7 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                         self.lifecycle.flickSuggestDismissTask?.cancel()
                         self.action.registerLongPressActionEnd(self.model.longPressActions(variableStates: variableStates))
                         self.lifecycle.flickAllSuggestTask?.cancel()
-                        if let v = variation(for: d) {
+                        if let v = currentFlickMap[d] {
                             self.action.reserveLongPressAction(v.longPressActions, taskStartDuration: longpressDuration(v.longPressActions), variableStates: variableStates)
                         }
                     }
@@ -307,12 +306,12 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                             // Reflect latest direction into state and marker
                             if d != prevDirection {
                                 // end previous direction's reserved longpress
-                                if let vPrev = variation(for: prevDirection) {
+                                if let vPrev = currentFlickMap[prevDirection] {
                                     self.action.registerLongPressActionEnd(vPrev.longPressActions)
                                 }
                                 self.lifecycle.state = .flickOneSuggested(d, Date())
                                 // reserve for new direction
-                                if let vNew = variation(for: d) {
+                                if let vNew = currentFlickMap[d] {
                                     self.action.reserveLongPressAction(vNew.longPressActions, taskStartDuration: longpressDuration(vNew.longPressActions), variableStates: variableStates)
                                 }
                             }
@@ -328,11 +327,11 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                                 self.flickSuggestType = .flick(d)
                             }
                             // end previous longpress and start new one
-                            if let vPrev = variation(for: direction) {
+                            if let vPrev = currentFlickMap[direction] {
                                 self.action.registerLongPressActionEnd(vPrev.longPressActions)
                             }
                             self.lifecycle.state = .flickOneSuggested(d, Date())
-                            if let vNew = variation(for: d) {
+                            if let vNew = currentFlickMap[d] {
                                 self.action.reserveLongPressAction(vNew.longPressActions, taskStartDuration: longpressDuration(vNew.longPressActions), variableStates: variableStates)
                             }
                         }
@@ -343,7 +342,7 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                     if self.lifecycle.lockedOutcome == .allFlickSuggest,
                        self.model.isFlickAble(to: d, variableStates: variableStates),
                        startLocation.distance(to: value.location) > self.model.flickSensitivity(to: d),
-                       !self.flickMap().isEmpty {
+                       !currentFlickMap.isEmpty {
                         if case .flick = self.flickSuggestType {} else {
                             // 一方向サジェストに切り替えるので小バブルを閉じる
                             self.qwertySuggestType = nil
@@ -355,7 +354,7 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                             // End long-press reservation now that we moved into a direction
                             self.action.registerLongPressActionEnd(self.model.longPressActions(variableStates: variableStates))
                             self.lifecycle.flickAllSuggestTask?.cancel()
-                            if let v = variation(for: d) {
+                            if let v = currentFlickMap[d] {
                                 self.action.reserveLongPressAction(v.longPressActions, taskStartDuration: longpressDuration(v.longPressActions), variableStates: variableStates)
                             }
                         }
@@ -366,7 +365,8 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                 }
             }
             .onEnded { _ in
-                guard !self.flickMap().isEmpty else { return }
+                let currentFlickMap = self.flickMap()
+                guard !currentFlickMap.isEmpty else { return }
                 let dismiss: Task<Void, Never> = Task { @MainActor in
                     try? await Task.sleep(nanoseconds: 70_000_000)
                     self.qwertySuggestType = nil
@@ -380,7 +380,7 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                     }
                 }
                 if case let .flickOneSuggested(direction, date) = lifecycle.state {
-                    if let v = variation(for: direction), Date().timeIntervalSince(date) >= self.longpressDuration(v.longPressActions) {
+                    if let v = currentFlickMap[direction], Date().timeIntervalSince(date) >= self.longpressDuration(v.longPressActions) {
                         self.lifecycle.state = .longFlicked(direction)
                     }
                 }
@@ -391,9 +391,9 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                 // End any reserved variation longpress for current direction
                 switch lifecycle.state {
                 case let .flickOneSuggested(direction, _):
-                    if let v = variation(for: direction) { self.action.registerLongPressActionEnd(v.longPressActions) }
+                    if let v = currentFlickMap[direction] { self.action.registerLongPressActionEnd(v.longPressActions) }
                 case let .longFlicked(direction):
-                    if let v = variation(for: direction) { self.action.registerLongPressActionEnd(v.longPressActions) }
+                    if let v = currentFlickMap[direction] { self.action.registerLongPressActionEnd(v.longPressActions) }
                 default:
                     break
                 }
@@ -403,21 +403,20 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
                 case .started:
                     self.action.registerActions(self.model.pressActions(variableStates: variableStates), variableStates: variableStates)
                 case let .flickOneSuggested(direction, _):
-                    if let v = variation(for: direction) {
+                    if let v = currentFlickMap[direction] {
                         self.action.registerActions(v.pressActions, variableStates: variableStates)
                     }
                 case .longPressed:
                     break
                 case .longFlicked:
                     do {
-                        let map = flickMap()
                         // 長フリックで長押しが設定されていない場合はpressActions
                         // ここでは長押しは予約解除済みなので発火せず、pressのみ
                         // 長押しの有無までは表層から取れないため、pressのみ実施
                         // 既存FlickKeyViewに近い操作感を維持
                         // (詳細制御が必要になればUnifiedVariationにフラグを追加)
                         // fall through to oneDirection behavior when longpress is empty
-                        if case let .longFlicked(direction) = lifecycle.state, let v = map[direction], v.longPressActions.isEmpty {
+                        if case let .longFlicked(direction) = lifecycle.state, let v = currentFlickMap[direction], v.longPressActions.isEmpty {
                             self.action.registerActions(v.pressActions, variableStates: variableStates)
                         }
                     }
@@ -444,7 +443,8 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
         DragGesture(minimumDistance: .zero)
             .onChanged { value in
                 // For keys with flick variations, allow linear handling only when linear mode is locked/active
-                if !self.flickMap().isEmpty && lifecycle.lockedOutcome != .linearVariation {
+                let currentFlickMap = self.flickMap()
+                if !currentFlickMap.isEmpty && lifecycle.lockedOutcome != .linearVariation {
                     if case .linearVariations = lifecycle.state {} else {
                         return
                     }
@@ -528,7 +528,8 @@ public struct UnifiedGenericKeyView<Extension: ApplicationSpecificKeyboardViewEx
             }
             .onEnded { _ in
                 // Commit only if linear mode is active or key has no flicks
-                if !self.flickMap().isEmpty && lifecycle.lockedOutcome != .linearVariation {
+                let currentFlickMap = self.flickMap()
+                if !currentFlickMap.isEmpty && lifecycle.lockedOutcome != .linearVariation {
                     if case .linearVariations = lifecycle.state {} else {
                         return
                     }

@@ -309,9 +309,16 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
 
         if requireSetResult {
             // MARK: VariableStateに操作の結果を反映する
-            // 左右の文字列
-            let (left, center, right) = self.inputManager.getSurroundingText()
-            variableStates.setSurroundingText(leftSide: left, center: center, rightSide: right)
+            // 左右の文字列（カーソルバー表示中または置換ターゲットがある場合のみIPCを実行）
+            let replacementTarget = variableStates.tabManager.existentialTab().replacementTarget
+            if variableStates.barState == .cursor || !replacementTarget.isEmpty {
+                let (left, center, right) = self.inputManager.getSurroundingText()
+                variableStates.setSurroundingText(leftSide: left, center: center, rightSide: right)
+                // MARK: Replacementの更新をする
+                if !replacementTarget.isEmpty {
+                    self.inputManager.updateTextReplacementCandidates(left: left, center: center, right: right, target: replacementTarget)
+                }
+            }
             // エンターキーの状態
             variableStates.setEnterKeyState(
                 variableStates.resultModel.getSelectedCandidate() == nil ? self.inputManager.getEnterKeyState() : .complete
@@ -326,10 +333,6 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
             }
             // MARK: 言語を更新する
             self.inputManager.setKeyboardLanguage(variableStates.keyboardLanguage)
-            // MARK: Replacementの更新をする
-            if !variableStates.tabManager.existentialTab().replacementTarget.isEmpty {
-                self.inputManager.updateTextReplacementCandidates(left: left, center: center, right: right, target: variableStates.tabManager.existentialTab().replacementTarget)
-            }
         }
     }
 
@@ -377,7 +380,6 @@ final class KeyboardActionManager: UserActionManager, @unchecked Sendable {
             }
             variableStates.upsideComponent = component
             variableStates.setHasUpsideComponent(variableStates.upsideComponent != nil)
-            self?.delegate?.updateScreenHeight()
         }
     }
 

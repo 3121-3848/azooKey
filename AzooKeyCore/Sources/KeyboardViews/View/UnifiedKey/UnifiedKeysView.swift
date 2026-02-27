@@ -34,7 +34,13 @@ public struct UnifiedKeysView<Extension: ApplicationSpecificKeyboardViewExtensio
                 let keyID = "\(item.position.x)-\(item.position.y)"
                 let keyView = UnifiedGenericKeyView<Extension>(model: item.model, tabDesign: tabDesign, size: info.size, isSuggesting: Binding(
                     get: { activeSuggestKeys.contains(keyID) },
-                    set: { newValue in if newValue { activeSuggestKeys.insert(keyID) } else { activeSuggestKeys.remove(keyID) } }
+                    set: { newValue in
+                        if newValue {
+                            if !activeSuggestKeys.contains(keyID) { activeSuggestKeys.insert(keyID) }
+                        } else {
+                            if activeSuggestKeys.contains(keyID) { activeSuggestKeys.remove(keyID) }
+                        }
+                    }
                 ))
                 contentGenerator(keyView, item.position)
                     .zIndex(activeSuggestKeys.contains(keyID) ? 1 : 0)
