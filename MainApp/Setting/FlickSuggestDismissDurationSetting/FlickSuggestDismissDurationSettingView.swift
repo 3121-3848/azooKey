@@ -19,11 +19,11 @@ struct FlickSuggestDismissDurationSettingView: View {
 
     @MainActor private var explanation: LocalizedStringKey {
         switch setting.value {
-        case 0 ..< 0.03: return "すぐ消える"
-        case 0.03 ..< 0.06: return "やや短い"
-        case 0.06 ..< 0.1: return "普通"
-        case 0.1 ..< 0.25: return "やや長い"
-        case 0.25 ... 0.5: return "長い"
+        case 0 ..< 0.02: return "すぐ消える"
+        case 0.02 ..< 0.05: return "やや短い"
+        case 0.05 ..< 0.08: return "普通"
+        case 0.08 ..< 0.09: return "やや長い"
+        case 0.09 ... 0.1: return "長い"
         default: return "普通"
         }
     }
@@ -42,7 +42,7 @@ struct FlickSuggestDismissDurationSettingView: View {
         }
         if enabled {
             VStack {
-                Slider(value: $setting.value, in: 0 ... 0.5)
+                Slider(value: $setting.value, in: 0 ... 0.1)
                 Text(explanation)
             }
         }
