@@ -311,11 +311,7 @@ public enum Design {
             if userDecidedSize != -1 {
                 return .system(size: userDecidedSize * fontSize.scale, weight: theme.textFont.weight, design: .default)
             }
-            let maxFontSize = if text.count == 1 {
-                Int(30 * fontSize.scale)
-            } else {
-                Int(22 * fontSize.scale)
-            }
+            let maxFontSize = Int(22 * fontSize.scale)
             let size = self.getMaximumFontSize(for: text, width: width, maxFontSize: maxFontSize)
             return Font.system(size: size, weight: theme.textFont.weight, design: .default)
         }
